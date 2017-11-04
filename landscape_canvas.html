@@ -1,79 +1,155 @@
 <!DOCTYPE html>
 <html>
+<!-- https://codepen.io/keenode/pen/amqjZQ -->
 <head>
     <title>Landscape Canvas</title>
-
     <style type="text/css">
-        body {
-  padding: 15px;
-  font-family: Verdana, sans-serif;
-  background-color: #666;
-}
+    body {
+        padding: 15px;
+        font-family: Verdana, sans-serif;
+        background-color: #666;
+    }
 
-.canvas-map {
-  margin-top: 10px;
-  background-color: black;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
-}
+    .canvas-map {
+        margin-top: 10px;
+        background-color: lightBlue;
+        box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+    }
 
-label {
-  margin-left: 10px;
-  color: #ccc;
-  font-size: 14px;
-  user-select: none;
-}
-
+    label {
+        margin-left: 10px;
+        color: #ccc;
+        font-size: 14px;
+        user-select: none;
+    }
     </style>
 </head>
+
 <body>
-
-<div>
-  <input id="toggle-grid" type="checkbox"><label for="toggle-grid">Show grid?</label>
-</div>
-<canvas id="orthogonal-map" class="canvas-map" width="704" height="576"></canvas>
-
+    <div>
+        <input id="toggle-grid" type="checkbox">
+        <label for="toggle-grid">Show grid?</label>
+    </div>
+    <canvas id="orthogonal-map" class="canvas-map" width="5760" height="768"></canvas>
 </body>
-
 <script type="text/javascript">
-    // Possible tile types
+// Possible tile types
 const TILE_TYPES = {
-  0: { name: 'Sea', color: 'lightBlue' },
-  1: { name: 'Land', color: 'wheat' }
-}
+    0: { name: 'Sky', type: 'color', size: { x: 128, y: 128 }, value: 'lightBlue' },
+    1: { name: 'Land01', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    2: { name: 'Land02', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    3: { name: 'Land03', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    4: { name: 'Land04', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    5: { name: 'Land05', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    6: { name: 'Land06', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    7: { name: 'Land07', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    8: { name: 'Land08', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    9: { name: 'Land09', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    10: { name: 'Land10', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    11: { name: 'Land11', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    12: { name: 'Land12', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    13: { name: 'Land13', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    14: { name: 'Land14', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    15: { name: 'Land15', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    16: { name: 'Land16', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    17: { name: 'Water1', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    18: { name: 'Water2', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    19: { name: 'Bush1', type: 'image', size: { x: 133, y: 65 }, value: new Image() },
+    20: { name: 'Bush2', type: 'image', size: { x: 133, y: 65 }, value: new Image() },
+    21: { name: 'Bush3', type: 'image', size: { x: 73, y: 47 }, value: new Image() },
+    22: { name: 'Bush4', type: 'image', size: { x: 73, y: 46 }, value: new Image() },
+    23: { name: 'Crate', type: 'image', size: { x: 77, y: 77 }, value: new Image() },
+    24: { name: 'Mushroom1', type: 'image', size: { x: 49, y: 41 }, value: new Image() },
+    25: { name: 'Mushroom2', type: 'image', size: { x: 50, y: 41 }, value: new Image() },
+    26: { name: 'Sign1', type: 'image', size: { x: 63, y: 65 }, value: new Image() },
+    27: { name: 'Sign2', type: 'image', size: { x: 62, y: 64 }, value: new Image() },
+    28: { name: 'Stone', type: 'image', size: { x: 90, y: 54 }, value: new Image() },
+    29: { name: 'Tree1', type: 'image', size: { x: 116, y: 44 }, value: new Image() },
+    30: { name: 'Tree2', type: 'image', size: { x: 282, y: 301 }, value: new Image() },
+    31: { name: 'Tree3', type: 'image', size: { x: 282, y: 275 }, value: new Image() }
+};
+
+TILE_TYPES[1].value.src = 'img/normaltileset/tiles/1.png';
+TILE_TYPES[2].value.src = 'img/normaltileset/tiles/2.png';
+TILE_TYPES[3].value.src = 'img/normaltileset/tiles/3.png';
+TILE_TYPES[4].value.src = 'img/normaltileset/tiles/4.png';
+TILE_TYPES[5].value.src = 'img/normaltileset/tiles/5.png';
+TILE_TYPES[6].value.src = 'img/normaltileset/tiles/6.png';
+TILE_TYPES[7].value.src = 'img/normaltileset/tiles/7.png';
+TILE_TYPES[8].value.src = 'img/normaltileset/tiles/8.png';
+TILE_TYPES[9].value.src = 'img/normaltileset/tiles/9.png';
+TILE_TYPES[10].value.src = 'img/normaltileset/tiles/10.png';
+TILE_TYPES[11].value.src = 'img/normaltileset/tiles/11.png';
+TILE_TYPES[12].value.src = 'img/normaltileset/tiles/12.png';
+TILE_TYPES[13].value.src = 'img/normaltileset/tiles/13.png';
+TILE_TYPES[14].value.src = 'img/normaltileset/tiles/14.png';
+TILE_TYPES[15].value.src = 'img/normaltileset/tiles/15.png';
+TILE_TYPES[16].value.src = 'img/normaltileset/tiles/16.png';
+TILE_TYPES[17].value.src = 'img/normaltileset/tiles/17.png';
+TILE_TYPES[18].value.src = 'img/normaltileset/tiles/18.png';
+TILE_TYPES[19].value.src = 'img/normaltileset/objects/bush_1.png';
+TILE_TYPES[20].value.src = 'img/normaltileset/objects/bush_2.png';
+TILE_TYPES[21].value.src = 'img/normaltileset/objects/bush_3.png';
+TILE_TYPES[22].value.src = 'img/normaltileset/objects/bush_4.png';
+TILE_TYPES[23].value.src = 'img/normaltileset/objects/crate.png';
+TILE_TYPES[24].value.src = 'img/normaltileset/objects/mushroom_1.png';
+TILE_TYPES[25].value.src = 'img/normaltileset/objects/mushroom_2.png';
+TILE_TYPES[26].value.src = 'img/normaltileset/objects/sign_1.png';
+TILE_TYPES[27].value.src = 'img/normaltileset/objects/sign_2.png';
+TILE_TYPES[28].value.src = 'img/normaltileset/objects/stone.png';
+TILE_TYPES[29].value.src = 'img/normaltileset/objects/tree_1.png';
+TILE_TYPES[30].value.src = 'img/normaltileset/objects/tree_2.png';
+TILE_TYPES[31].value.src = 'img/normaltileset/objects/tree_3.png';
 
 // Map tile data
 const mapData = [
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-  [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1],
-]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+    [27, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
 
 /**
   Tile class
  */
 class Tile {
 
-  constructor (size, type, ctx) {
-    this.size = size
-    this.type = type
-    this.ctx = ctx
-  }
+    constructor(size, type, ctx) {
+        this.size = size;
+        this.type = type;
+        this.ctx = ctx;
+    }
 
-  draw (x, y) {
-    // Store positions
-    const xPos = x * this.size
-    const yPos = y * this.size
+    draw(x, y) {
+        // Store positions
+        let xPos = x * this.size;
+        let yPos = y * this.size;
 
-    // Draw tile
-    this.ctx.fillStyle = this.type.color
-    this.ctx.fillRect(xPos, yPos, this.size, this.size)
-  }
+        if (this.type.size.x !== this.size) {
+            xPos = xPos + (this.size - this.type.size.x) / 2;
+        }
+
+        if (this.type.size.x !== this.size) {
+            yPos =yPos + (this.size - this.type.size.y );
+        }
+
+        // Draw tile
+        if (this.type.type === 'color') {
+        // this.ctx.fillStyle = this.type.value;
+        // this.ctx.fillRect(xPos, yPos, this.size, this.size);
+        }
+        if (this.type.type === 'image') {
+            // this.ctx.drawImage(this.type.value, xPos, yPos, this.size, this.size);
+            // this.ctx.drawImage(this.type.value,
+            //     xPos,
+            //     yPos,
+            //     this.type.size.x,
+            //     this.type.size.y);
+            this.ctx.drawImage(this.type.value, xPos, yPos);
+        }
+    }
 }
 
 /**
@@ -81,26 +157,41 @@ class Tile {
  */
 class Map {
 
-  constructor (selector, data, opts) {
-    this.canvas = document.getElementById(selector)
-    this.ctx = this.canvas.getContext('2d')
-    this.data = data
-    this.tileSize = opts.tileSize
-    this.showGrid = false
-  }
+    constructor(selector, data, opts) {
+        this.canvas = document.getElementById(selector);
+        this.ctx = this.canvas.getContext('2d');
+        this.data = data;
+        this.tileSize = opts.tileSize;
+        this.showGrid = false;
+    }
 
-  draw () {
-    // Clear canvas before redrawing
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
+    draw() {
+        // Clear canvas before redrawing
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
-  toggleGrid () {
-    // Toggle show grid option
-    this.showGrid = !this.showGrid
+    toggleGrid() {
+        // Toggle show grid option
+        this.showGrid = !this.showGrid;
 
-    // Redraw map
-    this.draw()
-  }
+        // Redraw map
+        this.draw();
+    }
+
+    tileClick(event){
+        let xPos = Math.floor(event.layerX / this.tileSize) ;
+        let yPos = Math.floor(event.layerY / this.tileSize);
+        // alert('X=' + xPos + ' Y=' + yPos);
+
+        if (this.data[yPos][xPos] === 31){
+            this.data[yPos][xPos] = 0;
+        }
+        else {
+            this.data[yPos][xPos] = this.data[yPos][xPos] + 1;
+        }
+
+        this.draw();
+    }
 }
 
 /**
@@ -108,69 +199,73 @@ class Map {
  */
 class OrthogonalMap extends Map {
 
-  constructor (selector, data, opts) {
-    super(selector, data, opts)
-    this.draw()
-  }
-
-  draw () {
-    super.draw() // Call draw() method from Map class
-
-    const numCols = this.data[0].length
-    const numRows = this.data.length
-
-    // Iterate through map data and draw each tile
-    for (let y = 0; y < numRows; y++) {
-      for (let x = 0; x < numCols; x++) {
-
-        // Get tile ID from map data
-        const tileId = this.data[y][x]
-
-        // Use tile ID to determine tile type from TILE_TYPES (i.e. Sea or Land)
-        const tileType = TILE_TYPES[tileId]
-
-        // Create tile instance and draw to our canvas
-        new Tile(this.tileSize, tileType, this.ctx).draw(x, y)
-
-        // Draw an outline with coordinates on top of tile if show grid is enabled
-        if (this.showGrid) {
-          this.drawGridTile(x, y)
-        }
-      }
+    constructor(selector, data, opts) {
+        super(selector, data, opts);
+        this.draw();
     }
-  }
 
-  drawGridTile (x, y) {
-    // Store positions
-    const xPos = x * this.tileSize
-    const yPos = y * this.tileSize
+    draw() {
+        super.draw(); // Call draw() method from Map class
 
-    // Draw coordinate text
-    this.ctx.font = '14px serif'
-    this.ctx.textAlign= 'center'
-    this.ctx.fillStyle = '#333'
-    this.ctx.fillText(x + ', ' + y, xPos + this.tileSize / 2, yPos + this.tileSize / 2 + 5)
+        const numCols = this.data[0].length;
+        const numRows = this.data.length;
 
-    // Draw grid
-    this.ctx.strokeStyle = '#999'
-    this.ctx.lineWidth = 0.5
-    this.ctx.strokeRect(xPos, yPos, this.tileSize, this.tileSize)
-  }
+        // Iterate through map data and draw each tile
+        for (let y = 0; y < numRows; y++) {
+            for (let x = 0; x < numCols; x++) {
+
+                // Get tile ID from map data
+                const tileId = this.data[y][x];
+
+                // Use tile ID to determine tile type from TILE_TYPES (i.e. Sea or Land)
+                const tileType = TILE_TYPES[tileId];
+
+                // Create tile instance and draw to our canvas
+                new Tile(this.tileSize, tileType, this.ctx).draw(x, y);
+
+                // Draw an outline with coordinates on top of tile if show grid is enabled
+                if (this.showGrid) {
+                    this.drawGridTile(x, y);
+                }
+            }
+        }
+    }
+
+    drawGridTile(x, y) {
+        // Store positions
+        const xPos = x * this.tileSize;
+        const yPos = y * this.tileSize;
+
+        // Draw coordinate text
+        this.ctx.font = '14px serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillText(x + ', ' + y, xPos + this.tileSize / 2, yPos + this.tileSize / 2 + 5);
+
+        // Draw grid
+        this.ctx.strokeStyle = '#999';
+        this.ctx.lineWidth = 0.5;
+        this.ctx.strokeRect(xPos, yPos, this.tileSize, this.tileSize);
+    }
 }
 
 // Init canvas tile map on document ready
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 
-  // Init orthogonal map
-  const map = new OrthogonalMap('orthogonal-map', mapData, { tileSize: 64 })
+    // Init orthogonal map
+    const map = new OrthogonalMap('orthogonal-map', mapData, { tileSize: 128 });
 
-  // Bind click event to show grid checkbox toggle
-  const cb = document.getElementById('toggle-grid')
-  cb.addEventListener('click', function () {
-    map.toggleGrid()
-  })
-})
+    // Bind click event to show grid checkbox toggle
+    const cb = document.getElementById('toggle-grid');
+    cb.addEventListener('click', function() {
+        map.toggleGrid();
+    });
 
+    const om = document.getElementById('orthogonal-map');
+    om.addEventListener('click', function(event) {
+        map.tileClick(event);
+    });
+});
 </script>
 
 </html>
