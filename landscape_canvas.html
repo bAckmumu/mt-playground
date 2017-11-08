@@ -22,6 +22,14 @@
         font-size: 14px;
         user-select: none;
     }
+
+    img {
+        image-rendering: -moz-crisp-edges;         /* Firefox */
+        image-rendering: -webkit-crisp-edges;      /* Webkit */
+        -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+        image-rendering: pixelated;                /* Chrome */
+    }
+
     </style>
 </head>
 
@@ -52,7 +60,7 @@ const TILE_TYPES = {
     14: { name: 'Land14', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
     15: { name: 'Land15', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
     16: { name: 'Land16', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
-    17: { name: 'Water1', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
+    17: { name: 'Water1', type: 'image', size: { x: 128, y: 99 }, value: new Image() },
     18: { name: 'Water2', type: 'image', size: { x: 128, y: 128 }, value: new Image() },
     19: { name: 'Bush1', type: 'image', size: { x: 133, y: 65 }, value: new Image() },
     20: { name: 'Bush2', type: 'image', size: { x: 133, y: 65 }, value: new Image() },
@@ -131,7 +139,7 @@ class Tile {
             xPos = xPos + (this.size - this.type.size.x) / 2;
         }
 
-        if (this.type.size.x !== this.size) {
+        if (this.type.size.y !== this.size) {
             yPos =yPos + (this.size - this.type.size.y );
         }
 
