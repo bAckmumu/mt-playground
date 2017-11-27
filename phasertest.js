@@ -1,9 +1,9 @@
-var game = new Phaser.Game(1240, 896, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(768, 384, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 // var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
 
-    game.load.image('ground_1x1', 'img/ground_1x1.png');
+    game.load.image('ground', 'img/64_klein.png');
 
 }
 
@@ -22,6 +22,8 @@ var layer1Key;
 var layer2Key;
 var layer3Key;
 
+var tileSize = 64;
+
 function create() {
 
     game.stage.backgroundColor = '#2d2d2d';
@@ -30,22 +32,22 @@ function create() {
     map = game.add.tilemap();
 
     //  Add a Tileset image to the map
-    map.addTilesetImage('ground_1x1', null, 3328, 128);
+    map.addTilesetImage('ground', null, tileSize, tileSize);
 
     //  Creates a new blank layer and sets the map dimensions.
     //  In this case the map is 40x30 tiles in size and the tiles are 32x32 pixels in size.
-    layer1 = map.create('level1', 45, 6, 128, 128);
+    layer1 = map.create('level1', 45, 6, tileSize, tileSize);
     layer1.scrollFactorX = 0.5;
     layer1.scrollFactorY = 0.5;
 
     //  Resize the world
     layer1.resizeWorld();
 
-    layer2 = map.createBlankLayer('level2', 45, 6, 128, 128);
+    layer2 = map.createBlankLayer('level2', 45, 6, tileSize, tileSize);
     layer2.scrollFactorX = 0.8;
     layer2.scrollFactorY = 0.8;
 
-    layer3 = map.createBlankLayer('level3', 45, 6, 128, 128);
+    layer3 = map.createBlankLayer('level3', 45, 6, tileSize, tileSize);
 
     currentLayer = layer3;
 
@@ -108,14 +110,14 @@ function changeLayer(key) {
 
 function pickTile(sprite, pointer) {
 
-    currentTile = game.math.snapToFloor(pointer.x, 128) / 128;
+    currentTile = game.math.snapToFloor(pointer.x, tileSize) / tileSize;
 
 }
 
 function updateMarker() {
 
-    marker.x = currentLayer.getTileX(game.input.activePointer.worldX) * 128;
-    marker.y = currentLayer.getTileY(game.input.activePointer.worldY) * 128;
+    marker.x = currentLayer.getTileX(game.input.activePointer.worldX) * tileSize;
+    marker.y = currentLayer.getTileY(game.input.activePointer.worldY) * tileSize;
 
     if (game.input.mousePointer.isDown)
     {
@@ -149,8 +151,8 @@ function update() {
 
 function render() {
 
-    game.debug.text('Current Layer: ' + currentLayer.name, 16, 550);
-    game.debug.text('1-3 Switch Layers. SPACE = Show All. Cursors = Move Camera', 16, 570);
+    game.debug.text('Current Layer: ' + currentLayer.name, 16, 350);
+    game.debug.text('1-3 Switch Layers. SPACE = Show All. Cursors = Move Camera', 16, 370);
 
 }
 
@@ -161,12 +163,12 @@ function createTileSelector() {
 
     var tileSelectorBackground = game.make.graphics();
     tileSelectorBackground.beginFill(0x000000, 0.5);
-    tileSelectorBackground.drawRect(0, 0, 3328, 128);
+    tileSelectorBackground.drawRect(0, 0, tileSize * 4, tileSize);
     tileSelectorBackground.endFill();
 
     tileSelector.add(tileSelectorBackground);
 
-    var tileStrip = tileSelector.create(1, 1, 'ground_1x1');
+    var tileStrip = tileSelector.create(1, 1, 'ground');
     tileStrip.inputEnabled = true;
     tileStrip.events.onInputDown.add(pickTile, this);
 
@@ -175,6 +177,6 @@ function createTileSelector() {
     //  Our painting marker
     marker = game.add.graphics();
     marker.lineStyle(2, 0x000000, 1);
-    marker.drawRect(0, 0, 128, 128);
+    marker.drawRect(0, 0, tileSize, tileSize);
 
 }
